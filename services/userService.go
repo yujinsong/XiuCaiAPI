@@ -4,6 +4,9 @@ import (
 	"github.com/XiuCai/XiuCaiAPI/common"
 	"github.com/XiuCai/XiuCaiAPI/dao"
 	"github.com/XiuCai/XiuCaiAPI/model"
+	"math/rand"
+	"time"
+	"strconv"
 )
 
 // ios 显示积分与钱
@@ -30,4 +33,22 @@ func UserLevel(uuid int64) int {
 
 func GetUserById(uuid int64) (model.User, error) {
 	return dao.GetUserInstance().GetUserById(uuid)
+}
+
+func GetUserByTel(tel string) (model.User, error) {
+	return dao.GetUserInstance().GetUserByTel(tel)
+}
+
+func Register(loginModel model.LoginModel) int64 {
+	userName := GenerateUserName()
+	uuid := dao.GetUserInstance().Register(loginModel.Tel, userName)
+
+	return uuid
+}
+
+
+func GenerateUserName() string {
+	rand.Seed(time.Now().UnixNano())
+	rand := rand.Intn(88888888)
+	return "秀才" + strconv.Itoa(100000 + rand)
 }

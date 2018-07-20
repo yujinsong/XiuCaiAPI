@@ -36,4 +36,6 @@ const (
 	UpdateMessage = "1:强化了社群。\n2:社群群主可以将优质的内容推荐到首页。"
 
 	ImagePrefix = "http://112.126.70.11/images/xiucai/"
+
+	ImageSize = 150000
 )

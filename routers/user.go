@@ -10,8 +10,9 @@ func SetUserRouters(router *mux.Router) *mux.Router {
 	userRouter := mux.NewRouter()
 	userRouter.HandleFunc("/Xiucai/User/checkCode", controllers.CheckCode).Methods("POST")
 	userRouter.HandleFunc("/Xiucai/User/checkSession", controllers.CheckSession).Methods("POST")
+	userRouter.HandleFunc("/Xiucai/User/login", controllers.Login).Methods("POST")
 
-	router.PathPrefix("/User").Handler(negroni.New(
+	router.PathPrefix("/Xiucai/User").Handler(negroni.New(
 		//negroni.HandlerFunc(common.Authorize),
 		negroni.Wrap(userRouter),
 	))

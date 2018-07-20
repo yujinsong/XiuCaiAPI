@@ -8,6 +8,9 @@ import (
 	"github.com/XiuCai/XiuCaiAPI/model"
 	"fmt"
 	"github.com/XiuCai/XiuCaiAPI/services"
+	"github.com/XiuCai/XiuCaiAPI/utils"
+	"encoding/json"
+	"strconv"
 )
 
 func CheckCode(rw http.ResponseWriter, req *http.Request)  {
@@ -52,8 +55,6 @@ func CheckSession(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	userLevel := services.UserLevel(uuid)
-
-
 	sessionModel := model.SessionModel{
 		Pushfeedtotopdesc: common.PushFeedToTopDesc,
 		Pushfeedtohomedesc: common.PushFeedToHomeDesc,
@@ -111,7 +112,67 @@ func CheckSession(rw http.ResponseWriter, req *http.Request) {
 	sessionModel.Cusimgurl = cusImgurl
 
 	response := common.Response(0, "成功", sessionModel)
-	fmt.Println(response)
 	rw.Write([]byte(response))
 
+}
+
+func Login(rw http.ResponseWriter, req *http.Request) {
+	body, _ := ioutil.ReadAll(req.Body)
+
+	var loginModel model.LoginModel
+	err := json.Unmarshal(body, &loginModel)
+	if err != nil || !common.CheckPhone(loginModel.Tel) {
+		response := common.Response(1, "登录失败", "")
+		rw.Write([]byte(response))
+		return
+	}
+
+	userInfo, err := services.GetUserByTel(loginModel.Tel)
+	if err != nil {
+		utils.Logger.Error("---- login error, tel:", loginModel.Tel, " error:", err)
+		response := common.Response(1, "登录失败", "")
+		rw.Write([]byte(response))
+		return
+	}
+
+	if userInfo.Id == 0 {
+		// 注册
+		uuid := services.Register(loginModel)
+		if uuid < 0 {
+			response := common.Response(1, "登录失败", "")
+			rw.Write([]byte(response))
+			return
+		}
+
+		loginResponse := model.LoginResponseModel{
+			Uuid: strconv.Itoa(int(uuid)),
+			Imgurl: "",
+			Imgsize: common.ImageSize,
+			Thumbimgurl: "",
+			Username: "",
+			Sex: "0",
+			Birthday: "",
+			Needfillinfo: "1",
+			Needfillsellinfo: "1",
+		}
+		response := common.Response(0, "登录成功", loginResponse)
+		rw.Write([]byte(response))
+		return
+	} else {
+		loginResponse := model.LoginResponseModel{
+			Uuid: strconv.Itoa(int(userInfo.Id)),
+			Imgurl: common.BuildImgUrl(common.ImagePrefix, userInfo.Srcimgurl),
+			Imgsize: common.ImageSize,
+			Thumbimgurl: common.BuildImgUrl(common.ImagePrefix, userInfo.Thumbimgurl),
+			Username: userInfo.Username,
+			Sex: strconv.Itoa(userInfo.Sex),
+			Birthday: userInfo.Birthday,
+			Needfillinfo: "0",
+			Needfillsellinfo: "0",
+		}
+
+		response := common.Response(0, "登录成功", loginResponse)
+		rw.Write([]byte(response))
+		return
+	}
 }

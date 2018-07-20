@@ -50,8 +50,16 @@ func BuildImgUrl(urlPrefix, url string) string {
 	if len(url) == 0 {
 		return ""
 	} else if len(url) > 4 && url[0:4] == "http" {
-		return urlPrefix + url
+		return  url
 	} else {
-		return url
+		return urlPrefix + url
 	}
+}
+
+func CurrentTime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func CurrentDate() string {
+	return time.Now().Format("2006-01-02")
 }

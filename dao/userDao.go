@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/XiuCai/XiuCaiAPI/model"
 	"github.com/XiuCai/XiuCaiAPI/utils"
+	"github.com/XiuCai/XiuCaiAPI/common"
 )
 
 var userInstance *UserInstance = nil
@@ -40,7 +41,7 @@ func (user *UserInstance) UserLevel(uuid int64) int {
 
 
 func (user *UserInstance) GetUserById(uuid int64) (model.User, error) {
-	sql := fmt.Sprintf("select * from userinfo where uuid = %d and flag in(0, 1)", uuid)
+	sql := fmt.Sprintf("select * from userinfo where id = %d and flag in(0, 1)", uuid)
 	var userInfo model.User
 	_, err := user.databaseEngineer.SQL(sql).Get(&userInfo)
 	if err != nil {
@@ -49,4 +50,32 @@ func (user *UserInstance) GetUserById(uuid int64) (model.User, error) {
 	}
 
 	return userInfo, nil
+}
+
+
+func (user *UserInstance) GetUserByTel(tel string) (model.User, error) {
+	sql := fmt.Sprintf("select * from userinfo where tel = '%s' and flag in(0, 1)", tel)
+	var userInfo model.User
+	_, err := user.databaseEngineer.SQL(sql).Get(&userInfo)
+	if err != nil {
+		utils.Logger.Error("------ Get user by id error, tel:", tel, " err:", err)
+		return model.User{}, err
+	}
+
+	return userInfo, nil
+}
+
+// 用户注册
+func (user *UserInstance) Register(tel, username string) int64 {
+	sql := fmt.Sprintf("insert into userinfo(`tel`, `username`, `regtime`) values ('%s', '%s', '%s')",
+		tel, username, common.CurrentTime())
+	result, err := user.databaseEngineer.Exec(sql)
+	if err != nil {
+		utils.Logger.Error("------ Register error, tel:", tel, " username:",
+			username, "regtime:", common.CurrentTime(), "err:", err)
+		return -1
+	}
+
+	uuid, _ := result.LastInsertId()
+	return uuid
 }

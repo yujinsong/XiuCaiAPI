@@ -94,4 +94,29 @@ type (
 		Cusname string `json:"cusname"`
 		Cusimgurl string `json:"cusimgurl"`
 	}
+
+	LoginModel struct {
+		Sessionid string `json:"sessionid"`
+		Uuid int64 `json:"uuid"`
+		Tel string `json:"tel"`
+		Deviceid string `json:"deviceid"`
+		Devicetype string `json:"devicetype"`
+		Unittype string `json:"unittype"`
+		Sysversion string `json:"sysversion"`
+		Softversion string `json:"softversion"`
+		Code string `json:"code"`
+	}
+
+	LoginResponseModel struct {
+		Uuid string `json:"uuid"`
+		Imgurl string `json:"imgurl"`
+		Imgsize int `json:"imgsize"`
+		Thumbimgurl string `json:"thumbimgurl"`
+		Username string `json:"username"`
+		Sex string `json:"sex"`
+		Birthday string `json:"birthday"`
+		Needfillinfo string `json:"needfillinfo"`
+		Needfillsellinfo string `json:"needfillsellinfo"`
+	}
+
 )
